@@ -6,7 +6,7 @@ class Host(models.Model):
     ipaddr = models.IPAddressField()
     login = models.CharField(max_length=12)
     passwd = models.CharField(max_length=20)
-
+    connection_type = models.CharField(max_length=20)
     def __unicode__(self):
         return self.hostname
 
