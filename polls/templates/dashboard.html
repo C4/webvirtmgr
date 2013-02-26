@@ -13,7 +13,7 @@
         </div>
       {% endfor %}
     {% endif %}
-    <a data-toggle="modal" href="#myModal" class="btn btn-success">Add Connection</a>
+    <a data-toggle="modal" href="#myModal" class="btn btn-success">Add Connections</a>
     <br><br>
     {% if host_info %}
     <div class="span8">
@@ -101,7 +101,16 @@
                   <input type="password" name="kvm_passwd" class="input-large" placeholder="******">
                 </div>
               </div>
-              </fieldset>
+              <div class="control-group">
+              <label class="control-label">Connection Type</label>
+                <div class="controls">
+                  <select name="connection_type">
+                    <option value="tcp">qemu+tcp</option>
+                    <option value="ssh">qemu+ssh</option>
+                  </select>
+                </div>
+              </div>
+            </fieldset>
           </div>
           <div class="modal-footer">
             <a href="#" class="btn" data-dismiss="modal">Cancel</a>

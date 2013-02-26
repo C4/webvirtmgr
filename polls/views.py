@@ -28,13 +28,22 @@ def libvirt_conn(host):
 
     flags = [libvirt.VIR_CRED_AUTHNAME, libvirt.VIR_CRED_PASSPHRASE]
     auth = [flags, creds, None]
-    uri = 'qemu+tcp://%s/system' % host.ipaddr
 
-    try:
-        conn = libvirt.openAuth(uri, auth, 0)
-        return conn
-    except libvirt.libvirtError as e:
-        return {'error': e.message}
+    if host.connection_type == "tcp":
+        uri = 'qemu+tcp://%s/system' % host.ipaddr
+        try:
+            conn = libvirt.openAuth(uri, auth, 0)
+            return conn
+        except libvirt.libvirtError as e:
+            return {'error': e.message}
+    if host.connection_type == "ssh":
+        uri = 'qemu+ssh://%s@%s/system' % (host.login, host.ipaddr)
+        try:
+            conn = libvirt.open(uri)
+            return conn
+        except libvirt.libvirtError as e:
+            return {'error': e.message}
+
 
 
 def test_cpu_accel(conn):
@@ -127,7 +136,8 @@ def dashboard(request):
                 import socket
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.settimeout(1)
-                s.connect((host.ipaddr, 16509))
+                #s.connect((host.ipaddr, 16509))
+                s.connect((host.ipaddr, 22))
                 s.close()
                 status = 1
             except Exception as err:
@@ -139,8 +149,8 @@ def dashboard(request):
         hosts = Host.objects.get(id=host_id)
         hosts.delete()
 
-    def add_host(host, ipaddr, login, passwd):
-        hosts = Host(hostname=host, ipaddr=ipaddr, login=login, passwd=passwd)
+    def add_host(host, ipaddr, login, passwd, connection_type):
+        hosts = Host(hostname=host, ipaddr=ipaddr, login=login, passwd=passwd, connection_type=connection_type)
         hosts.save()
 
     hosts = Host.objects.filter()
@@ -157,9 +167,10 @@ def dashboard(request):
             ipaddr = request.POST.get('ipaddr', '')
             login = request.POST.get('kvm_login', '')
             passwd = request.POST.get('kvm_passwd', '')
+            connection_type = request.POST.get('connection_type', '')
 
             import re
-            simbol = re.search('[^a-zA-Z0-9\_]+', name)
+            simbol = re.search('[^a-zA-Z0-9\-]+', name)
             ipsimbol = re.search('[^a-z0-9\.\-]+', ipaddr)
             domain = re.search('[\.]+', ipaddr)
 
@@ -187,11 +198,11 @@ def dashboard(request):
             if not login:
                 msg = 'No KVM login was been entered'
                 errors.append(msg)
-            if not passwd:
-                msg = 'No KVM password was been entered'
-                errors.append(msg)
+            #if not passwd:
+            #    msg = 'No KVM password was been entered'
+            #    errors.append(msg)
             if not errors:
-                add_host(name, ipaddr, login, passwd)
+                add_host(name, ipaddr, login, passwd, connection_type)
                 return HttpResponseRedirect(request.get_full_path())
 
     return render_to_response('dashboard.html', locals(), context_instance=RequestContext(request))
