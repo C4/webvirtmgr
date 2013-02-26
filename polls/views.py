@@ -136,8 +136,10 @@ def dashboard(request):
                 import socket
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.settimeout(1)
-                #s.connect((host.ipaddr, 16509))
-                s.connect((host.ipaddr, 22))
+                if host.connection_type == 'ssh':
+                    s.connect((host.ipaddr, 22))
+                else:    
+                    s.connect((host.ipaddr, 16509))
                 s.close()
                 status = 1
             except Exception as err:
