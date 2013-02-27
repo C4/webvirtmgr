@@ -35,6 +35,14 @@
       <div class="navbar-inner">
         <div class="container">
           <a class="brand" href="/">WebVirtMgr</a>
+          <ul class="nav">
+            <li class="">
+              <a href="/dashboard"><b>Dashboard</b></a>
+            </li>  
+            <li class="">
+              <a href="/setup"><b>Setup</b></a>
+            </li>           
+          </ul>
           <ul class="nav pull-right">
             {% if request.user.is_authenticated or user.is_authenticated %}
             <li class="">
@@ -49,10 +57,16 @@
         </div><!--/.container -->
       </div><!--/.navbar-inner -->
     </div><!--/.navbar -->      
-    <div class="container-narrow">
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span2"></div>
+        <div class="span8">
 
       {% block content %}{% endblock %}
 
+        </div>
+        <div class="span2"></div>
+      </div>
     </div> <!-- /container-narrow -->
 
     <!-- Le javascript
@@ -60,6 +74,5 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/{{ STATIC_URL }}js/jquery.js"></script>
     <script src="/{{ STATIC_URL }}js/bootstrap.js"></script>
-
   </body>
 </html>
