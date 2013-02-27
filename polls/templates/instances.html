@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="pull-right">
-      <a href="/setup">Host Server Setup</a>
-    </div>
-    <h2>Dashboard</h2>
+    <h2>Instances</h2>
     <hr>
     {% if errors %}
       {% for error in errors %}
@@ -13,60 +10,38 @@
         </div>
       {% endfor %}
     {% endif %}
-    <a data-toggle="modal" href="#myModal" class="btn btn-success">Add Connections</a>
-    <br><br>
-    {% if host_info %}
+    {% if instance_list %}
     <div>
-      <table class="table table-hover">
+      <table class="table table-striped table-bordered">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>FQDN / IP</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th>Hostname</th>
+            <th>IP Address</th>
+            <th>Instance ID</th>
+            <th>FQDN</th>
+            <th>CPUs</th>
+            <th>Memory</th>
+            <th>State</th>
+            <th>Location</th>
           </tr>
         </thead>
         <tbody>
-          {% for key, value in host_info.items %}
+          {% for instance in instance_list %}
           <tr>
-            <td><strong>{{ key }}</strong></td>
-            <td>{{ value.1 }}</td>
-            <td>{% ifequal value.2 1 %}<font color="green">connected</font>{% else %}<font color="red">not connected ({{ value.2 }})</font>{% endifequal %}</td>
-            <td style="width: 80px;">
-              {% ifequal value.2 1 %}
-              <div class="btn-group">
-                <button class="btn btn-success" onclick="location.href='/overview/{{ value.0 }}/'">Overview</button>
-                <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                  <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a href="/newvm/{{ value.0 }}/">Create VM</a></li>
-                  <li><a href="/storage/{{ value.0 }}/">Storage Pool</a></li>
-                  <li><a href="/network/{{ value.0 }}/">Network Pool</a></li>
-                  <li><a href="/snapshot/{{ value.0 }}/">Snapshots</a></li>
-                </ul>
-              </div>
-              {% else %}
-              <div class="btn-group">
-                <button class="btn btn-success disabled">Overview</button>
-                <button class="btn btn-success dropdown-toggle disabled" data-toggle="dropdown">
-                  <span class="caret"></span>
-                </button>
-              </div>
-              {% endifequal %}
-            </td>
-            <td style="width: 70px;">
-              <form action="/dashboard/" method="post" style="height:10px;">{% csrf_token %}
-                <input type="hidden" name="host_id" value="{{ value.0 }}">
-                <button type="submit" class="btn btn-danger" name="del_host" title="Delete" onclick="return confirm('Are you sure?')">Delete</button>
-              </form>
-            </td>
+            <td><strong>{{ instance.name }}</strong></td>
+            <td>{{ instance.ip }}</td>
+            <td>{{ instance.instanceid }}</td>
+            <td style="width: 80px;">{{ instance.fqdn }}</td>
+            <td style="width: 70px;">{{ instance.cpu }}</td>
+            <td>{{ instance.mem }}</td>
+            <td>{{ instance.state }}</td>
+            <td>{{ instance.location }}</td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
       {% else %}
-        <h4>You have no connection</h4>
+        <h4>No Instances found</h4>
         <br>
       {% endif %}
       <div id="myModal" class="modal hide fade">

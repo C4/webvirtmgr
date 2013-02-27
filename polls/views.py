@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from webvirtmgr.polls.models import *
-
+import sys
 
 def libvirt_conn(host):
     """
@@ -79,6 +79,48 @@ def get_all_vm(conn):
         add_error(e, 'libvirt')
         return "error"
 
+def get_all_vm_info(conn, host):
+    """
+
+    Get a list of all VMs with info
+
+    """
+
+    import libvirt
+    import virtinst.util as util
+    import string
+
+    states = {
+        libvirt.VIR_DOMAIN_NOSTATE: 'no state',
+        libvirt.VIR_DOMAIN_RUNNING: 'running',
+        libvirt.VIR_DOMAIN_BLOCKED: 'blocked on resource',
+        libvirt.VIR_DOMAIN_PAUSED: 'paused by user',
+        libvirt.VIR_DOMAIN_SHUTDOWN: 'being shut down',
+        libvirt.VIR_DOMAIN_SHUTOFF: 'shut off',
+        libvirt.VIR_DOMAIN_CRASHED: 'crashed',
+    }
+
+    info = []
+
+    try:
+        vname = {}
+        for id in conn.listDomainsID():
+            id = int(id)
+            dom = conn.lookupByID(id)
+            #vname[dom.name()] = dom.info()[0]
+            a = {"name":dom.name(), "ip":'', "instanceid":'', "fqdn":'', "cpu":str(dom.info()[3]),"mem":str(int(dom.info()[2]/1024)),"state":str(states.get(dom.info()[0])),"location":str(host)}
+            info.append(a)
+        for id in conn.listDefinedDomains():
+            dom = conn.lookupByName(id)
+            #vname[dom.name()] = dom.info()[0]
+            a = {"name":dom.name(), "ip":'', "instanceid":'', "fqdn":'', "cpu":str(dom.info()[3]),"mem":str(int(dom.info()[2]/1024)),"state":str(states.get(dom.info()[0])),"location":str(host)}
+            info.append(a)
+        return info
+    except libvirt.libvirtError as e:
+        add_error(e, 'libvirt')
+        return "error"
+
+
 
 def get_all_networks(conn):
     virtnet = {}
@@ -118,6 +160,50 @@ def index(request):
     else:
         return HttpResponseRedirect('/dashboard')
 
+def instances(request):
+    """
+
+    Instances page.
+
+    """
+
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/login')
+
+    instance_list = []
+    hosts = Host.objects.filter()
+    for host in hosts: # Looping through all of the hosts to find all of the vms lists. This should get cahced somewhere.
+        conn = libvirt_conn(host)
+        instances = get_all_vm_info(conn,host)
+        if type(instances) is list:
+            instance_list = instance_list + instances # Should be a full list of the instances / vms
+
+    #for instances in instance_list:
+    #    print >>sys.stderr, instances[name]
+
+
+    #print >>sys.stderr, instance_list    
+    errors = []
+
+    return render_to_response('instances.html', locals(), context_instance=RequestContext(request))    
+
+def get_hosts_status(hosts):
+    all_hosts = {}
+    for host in hosts:
+        try:
+            import socket
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(1)
+            if host.connection_type == 'ssh':
+                s.connect((host.ipaddr, 22))
+            else:    
+                s.connect((host.ipaddr, 16509))
+            s.close()
+            status = 1
+        except Exception as err:
+            status = err
+        all_hosts[host.hostname] = (host.id, host.ipaddr, status)
+    return all_hosts
 
 def dashboard(request):
     """
@@ -128,24 +214,6 @@ def dashboard(request):
 
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/login')
-
-    def get_hosts_status(hosts):
-        all_hosts = {}
-        for host in hosts:
-            try:
-                import socket
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.settimeout(1)
-                if host.connection_type == 'ssh':
-                    s.connect((host.ipaddr, 22))
-                else:    
-                    s.connect((host.ipaddr, 16509))
-                s.close()
-                status = 1
-            except Exception as err:
-                status = err
-            all_hosts[host.hostname] = (host.id, host.ipaddr, status)
-        return all_hosts
 
     def del_host(host_id):
         hosts = Host.objects.get(id=host_id)

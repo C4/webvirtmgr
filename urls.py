@@ -8,6 +8,7 @@ urlpatterns = patterns('',
     url(r'^logout/$', 'django.contrib.auth.views.logout', {'template_name': 'logout.html'}),
 
     url(r'^dashboard/$', 'webvirtmgr.polls.views.dashboard'),
+    url(r'^instances/$', 'webvirtmgr.polls.views.instances'),
 
     url(r'^overview/(\d+)/$', 'webvirtmgr.polls.views.overview'),
 
