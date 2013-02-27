@@ -8,6 +8,7 @@
 
     <!-- Le styles -->
     <link href="/{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
+    <link href="/{{ STATIC_URL }}css/DT_bootstrap.css" rel="stylesheet">
     <style type="text/css">
       body {
         padding-top: 60px;
@@ -18,6 +19,9 @@
       .container-narrow {
         margin: 0 auto;
         max-width: 990px;
+      }
+      #instance_list_filter{
+        margin-top: -76px;
       }
     </style>
     <link href="/{{ STATIC_URL }}css/bootstrap-responsive.css" rel="stylesheet">
@@ -38,6 +42,9 @@
           <ul class="nav">
             <li class="">
               <a href="/dashboard"><b>Dashboard</b></a>
+            </li>
+            <li class="">
+              <a href="/instances"><b>Instances</b></a>
             </li>  
             <li class="">
               <a href="/setup"><b>Setup</b></a>
@@ -74,5 +81,17 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="/{{ STATIC_URL }}js/jquery.js"></script>
     <script src="/{{ STATIC_URL }}js/bootstrap.js"></script>
+    <script src="/{{ STATIC_URL }}js/jquery.dataTables.js"></script>
+    <script src="/{{ STATIC_URL }}js/DT_bootstrap.js"></script>
+    <script type="text/javascript">
+      $.extend( $.fn.dataTableExt.oStdClasses, {
+          "sWrapper": "dataTables_wrapper form-inline"
+      } );
+      $(document).ready(function() {
+          $('#instance_list').dataTable( {
+              "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
+          } );
+      } );      
+    </script>
   </body>
 </html>
