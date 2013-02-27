@@ -16,8 +16,8 @@
         <thead>
           <tr>
             <th>Hostname</th>
-            <th>IP Address</th>
             <th>Instance ID</th>
+            <th>IP Address</th>
             <th>FQDN</th>
             <th>CPUs</th>
             <th>Memory</th>
@@ -29,12 +29,22 @@
           {% for instance in instance_list %}
           <tr>
             <td><strong><i class="icon-th-large"></i> <a href="/vm/{{ instance.hostid }}/{{ instance.name }}/">{{ instance.name }}</a></strong></td>
-            <td>{{ instance.ip }}</td>
             <td>{{ instance.instanceid }}</td>
+            <td>{{ instance.ip }}</td>
             <td style="width: 80px;">{{ instance.fqdn }}</td>
             <td style="width: 70px;">{{ instance.cpu }}</td>
             <td>{{ instance.mem }}</td>
-            <td>{{ instance.state }}</td>
+            <td>
+              {% if instance.state == "running" %}
+                <font color="green">{{ instance.state }}</font>
+              {% else %}
+                {% if instance.state == "shut off" %}
+                  <font color="red">{{ instance.state }}</font>
+                {% else %}
+                  {{ instance.state }}
+                {% endif %}
+              {% endif %}
+            </td>
             <td>{{ instance.location }}</td>
           </tr>
           {% endfor %}

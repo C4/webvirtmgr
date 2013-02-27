@@ -107,11 +107,11 @@ def get_all_vm_info(conn, host):
         for id in conn.listDomainsID():
             id = int(id)
             dom = conn.lookupByID(id)
-            a = {"name":dom.name(),"hostid":host.id, "hypervisor":str(dom.OSType()), "ip":'', "instanceid":'', "fqdn":'', "cpu":str(dom.info()[3]),"mem":str(int(dom.info()[2]/1024)),"state":str(states.get(dom.info()[0])),"location":str(host)}
+            a = {"name":dom.name(),"hostid":host.id, "instanceid":dom.UUIDString(), "hypervisor":str(dom.OSType()), "ip":'', "fqdn":'', "cpu":str(dom.info()[3]),"mem":str(int(dom.info()[2]/1024)),"state":str(states.get(dom.info()[0])),"location":str(host)}
             info.append(a)
         for id in conn.listDefinedDomains():
             dom = conn.lookupByName(id)
-            a = {"name":dom.name(),"hostid":host.id, "hypervisor":str(dom.OSType()), "ip":'', "instanceid":'', "fqdn":'', "cpu":str(dom.info()[3]),"mem":str(int(dom.info()[2]/1024)),"state":str(states.get(dom.info()[0])),"location":str(host)}
+            a = {"name":dom.name(),"hostid":host.id, "instanceid":dom.UUIDString(), "hypervisor":str(dom.OSType()), "ip":'', "fqdn":'', "cpu":str(dom.info()[3]),"mem":str(int(dom.info()[2]/1024)),"state":str(states.get(dom.info()[0])),"location":str(host)}
             info.append(a)
         return info
     except libvirt.libvirtError as e:
@@ -1227,7 +1227,7 @@ def vm(request, host_id, vname):
 
         xml = dom.XMLDesc(0)
         hdd = util.get_xml_path(xml, "/domain/devices/disk[1]/source/@file")
-        
+
         # If xml create custom
         if not hdd:
             hdd = util.get_xml_path(xml, "/domain/devices/disk[1]/source/@dev")
