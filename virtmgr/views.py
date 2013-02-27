@@ -2,8 +2,10 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
-from webvirtmgr.polls.models import *
+from webvirtmgr.virtmgr.models import *
 import sys
+
+
 
 def libvirt_conn(host):
     """
@@ -396,6 +398,9 @@ def newvm(request, host_id):
 
     """
 
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/login')
+
     def find_all_img(storages):
         import re
         disk = []
@@ -403,7 +408,9 @@ def newvm(request, host_id):
             stg = conn.storagePoolLookupByName(storage)
             stg.refresh(0)
             for img in stg.listVolumes():
-                if re.findall(".img", img) or re.findall(".IMG", img):
+                if re.findall(".iso", img) or re.findall(".ISO", img):
+                    pass
+                else:
                     disk.append(img)
         return disk
 
@@ -416,10 +423,15 @@ def newvm(request, host_id):
                     return vl.path()
 
     def add_vol(name, size):
+        import virtinst.util as util
+
+        stg_type = util.get_xml_path(stg.XMLDesc(0), "/pool/@type")
+        if stg_type == 'dir':
+            name = name + '.img'
         size = int(size) * 1073741824
         xml = """
             <volume>
-                <name>%s.img</name>
+                <name>%s</name>
                 <capacity>%s</capacity>
                 <allocation>0</allocation>
                 <target>
@@ -448,6 +460,19 @@ def newvm(request, host_id):
         if re.findall('/usr/libexec/qemu-kvm', conn.getCapabilities()):
             emulator = '/usr/libexec/qemu-kvm'
 
+        img = conn.storageVolLookupByPath(image)
+        vol = img.name()
+        for storage in all_storages:
+            stg = conn.storagePoolLookupByName(storage)
+            stg.refresh(0)
+            for img in stg.listVolumes():
+                if img == vol:
+                    stg_type = util.get_xml_path(stg.XMLDesc(0), "/pool/@type")
+                    if stg_type == 'dir':
+                        image_type = 'qcow2'
+                    else:
+                        image_type = 'raw'
+
         xml = """<domain type='%s'>
                   <name>%s</name>
                   <memory>%s</memory>
@@ -471,7 +496,7 @@ def newvm(request, host_id):
                   <devices>
                     <emulator>%s</emulator>
                     <disk type='file' device='disk'>
-                      <driver name='qemu' type='qcow2'/>
+                      <driver name='qemu' type='%s'/>
                       <source file='%s'/>
                       <target dev='hda' bus='ide'/>
                     </disk>
@@ -483,7 +508,7 @@ def newvm(request, host_id):
                     </disk>
                     <controller type='ide' index='0'>
                       <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x1'/>
-                    </controller>""" % (dom_type, name, ram, ram, vcpu, machine, emulator, image)
+                    </controller>""" % (dom_type, name, ram, ram, vcpu, machine, emulator, image_type, image)
 
         if re.findall("br", net):
             xml += """<interface type='bridge'>
@@ -509,9 +534,6 @@ def newvm(request, host_id):
         conn.defineXML(xml)
         dom = conn.lookupByName(name)
         dom.setAutostart(1)
-
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('/login')
 
     host = Host.objects.get(id=host_id)
     conn = libvirt_conn(host)
@@ -588,7 +610,13 @@ def newvm(request, host_id):
 
                     if not errors:
                         if not img:
-                            vol = vname + '.img'
+                            import virtinst.util as util
+
+                            stg_type = util.get_xml_path(stg.XMLDesc(0), "/pool/@type")
+                            if stg_type == 'dir':
+                                vol = vname + '.img'
+                            else:
+                                vol = vname
                         else:
                             vol = img
                         vl = stg.storageVolLookupByName(vol)
@@ -647,10 +675,15 @@ def storage(request, host_id, pool):
         conn.storagePoolDefineXML(xml, 0)
 
     def add_vol(name, size):
+        import virtinst.util as util
+
+        stg_type = util.get_xml_path(stg.XMLDesc(0), "/pool/@type")
+        if stg_type == 'dir':
+            name = name + '.img'
         size = int(size) * 1073741824
         xml = """
             <volume>
-                <name>%s.img</name>
+                <name>%s</name>
                 <capacity>%s</capacity>
                 <allocation>0</allocation>
                 <target>
@@ -660,6 +693,11 @@ def storage(request, host_id, pool):
         stg.createXML(xml, 0)
 
     def clone_vol(img, new_img):
+        import virtinst.util as util
+
+        stg_type = util.get_xml_path(stg.XMLDesc(0), "/pool/@type")
+        if stg_type == 'dir':
+            new_img = new_img + '.img'
         vol = stg.storageVolLookupByName(img)
         xml = """
             <volume>
@@ -838,30 +876,26 @@ def storage(request, host_id, pool):
                     return HttpResponseRedirect('/storage/%s/%s' % (host_id, pool))
                 if 'clone' in request.POST:
                     img = request.POST.get('img', '')
-                    new_img_name = request.POST.get('new_img', '')
-                    new_img = new_img_name + '.img'
-                    if info[6] == 'logical':
-                        new_img = new_img_name
-                    else:
-                        new_img = new_img_name + '.img'
+                    clone_name = request.POST.get('new_img', '')
+                    full_img_name = clone_name + '.img'
                     import re
                     errors = []
-                    name_have_simbol = re.search('[^a-zA-Z0-9\_]+', new_img_name)
-                    if new_img in stg.listVolumes():
-                        msg = 'Volume name already use'
+                    name_have_simbol = re.search('[^a-zA-Z0-9\_]+', clone_name)
+                    if full_img_name in stg.listVolumes():
+                        msg = _('Volume name already use')
                         errors.append(msg)
-                    if not new_img_name:
-                        msg = 'No name has been entered'
+                    if not clone_name:
+                        msg = _('No name has been entered')
                         errors.append(msg)
-                    elif len(new_img_name) > 20:
-                        msg = 'The host name must not exceed 20 characters'
+                    elif len(clone_name) > 20:
+                        msg = _('The host name must not exceed 20 characters')
                         errors.append(msg)
                     else:
                         if name_have_simbol:
-                            msg = 'The host name must not contain any characters'
+                            msg = _('The host name must not contain any characters')
                             errors.append(msg)
                     if not errors:
-                        clone_vol(img, new_img)
+                        clone_vol(img, clone_name)
                         return HttpResponseRedirect('/storage/%s/%s' % (host_id, pool))
 
         conn.close()
@@ -921,7 +955,7 @@ def network(request, host_id, pool):
 
     def ipv4_net():
         import virtinst.util as util
-        from polls.IPy import IP
+        from virtmgr.IPy import IP
 
         ipv4 = []
         xml_net = net.XMLDesc(0)
@@ -1005,7 +1039,7 @@ def network(request, host_id, pool):
                         msg = 'Pool name already use'
                         errors.append(msg)
                     try:
-                        from polls.IPy import IP
+                        from virtmgr.IPy import IP
 
                         netmask = IP(net_addr).strNetmask()
                         ipaddr = IP(net_addr)
