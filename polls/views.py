@@ -105,11 +105,11 @@ def get_all_vm_info(conn, host):
         for id in conn.listDomainsID():
             id = int(id)
             dom = conn.lookupByID(id)
-            a = {"name":dom.name(),"hostid":host.id, "ip":'', "instanceid":'', "fqdn":'', "cpu":str(dom.info()[3]),"mem":str(int(dom.info()[2]/1024)),"state":str(states.get(dom.info()[0])),"location":str(host)}
+            a = {"name":dom.name(),"hostid":host.id, "hypervisor":str(dom.OSType()), "ip":'', "instanceid":'', "fqdn":'', "cpu":str(dom.info()[3]),"mem":str(int(dom.info()[2]/1024)),"state":str(states.get(dom.info()[0])),"location":str(host)}
             info.append(a)
         for id in conn.listDefinedDomains():
             dom = conn.lookupByName(id)
-            a = {"name":dom.name(),"hostid":host.id, "ip":'', "instanceid":'', "fqdn":'', "cpu":str(dom.info()[3]),"mem":str(int(dom.info()[2]/1024)),"state":str(states.get(dom.info()[0])),"location":str(host)}
+            a = {"name":dom.name(),"hostid":host.id, "hypervisor":str(dom.OSType()), "ip":'', "instanceid":'', "fqdn":'', "cpu":str(dom.info()[3]),"mem":str(int(dom.info()[2]/1024)),"state":str(states.get(dom.info()[0])),"location":str(host)}
             info.append(a)
         return info
     except libvirt.libvirtError as e:

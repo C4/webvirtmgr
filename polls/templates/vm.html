@@ -24,7 +24,7 @@
             </div><!--/.well -->
           </div><!--/span-->
           <div class="span9 well">
-            <h2>Virtual Machine</h2>
+            <h2>{{ vname }}</h2>
             <hr>
             {% if messages %}
               {% for message in messages %}
@@ -46,9 +46,76 @@
               </div>
               {% endfor %}
             {% endif %}
-            <div class="span9">
-              <ul>
-                <li>Action For This Server</li><br>
+            <div class="">
+            <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>Instance Details</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Name</td>
+                        <td>{{ vname }}</td>
+                      </tr>
+                      <tr>
+                        <td>Status</td>
+                        <td><font color={% ifequal dom.info.0 5 %}"red">Not Active{% endifequal %}{% ifequal dom.info.0 1 %}"green">Active{% endifequal %}{% ifequal dom.info.0 3 %}"orange">Suspend{% endifequal %}</font></td>
+                      </tr>
+                      <tr>
+                        <td>Uptime</td>
+                        <td>{{ dom_uptime }}</td>
+                      </tr>
+                      <tr>
+                        <td>Virtual CPU(s)</td>
+                        <td><b>{{ dom_info.0 }}</b> (Usage: {{ cpu_usage }}%)<div class="progress"><div class="bar" style="width: {{ cpu_usage }}%;"></div></div></td>
+                      </tr>
+                      <tr>
+                        <td>Memory</td>
+                        <td>{{ dom_info.1 }} MB (Usage: {{ mem_usage.1 }}%)<div class="progress"><div class="bar" style="width: {{ mem_usage.1 }}%;"></div></div></td>
+                      </tr>   
+                      <tr>
+                        <td>MAC Address</td>
+                        <td>{{ dom_info.2 }} ({{ dom_info.3 }})</td>
+                      </tr>  
+                      <tr>
+                        <td>Root Volume</td>
+                        <td>{{ hdd_image.0 }} ({{ hdd_image.1 }})</td>
+                      </tr>  
+                      
+                      <tr>
+                        <td>Volumes</td>
+                        <td>{% if not media %}{% else %}{{ media }}{% endif %} 
+                        <form action="" method="post">{% csrf_token %}
+                          {% if media %}
+                          <div class="">
+                            <input type="hidden" name="iso_img" value="{{ media }}">
+                            <input type="submit" class="btn btn-small"  name="remove_iso" value="Disconnect" onclick="return confirm('Are you sure?')">
+                          </div>
+                          {% else %}
+                          <b>Images:</b> <select name="iso_img" class="btn btn-small">
+                          {% if iso_images %}
+                            {% for iso in iso_images %}
+                              <option value="{{ iso }}">{{ iso }}</option>
+                            {% endfor %}
+                          {% else %}
+                            <option value="none">None</option>
+                          {% endif %}
+                          </select>
+                          {% if iso_images %}
+                          <input type="submit" class="btn btn-small" name="add_iso" value="Connect">
+                          {% else %}
+                          <a class="btn disabled" name="connect">Connect</a>
+                          {% endif %}
+                          {% endif %}
+                        </form>
+                        </td>
+                      </tr>
+                                     
+                    </tbody>
+              </table>
+              <hr />
+              <div class="pagination-centered">
                 <form action="" method="post">{% csrf_token %}
                   {% ifequal dom.info.0 5 %}
                   <a href="#console" role="button" class="btn disabled" style="height:40px;width:60px;"><i class="icon-align-justify"></i><br>Console</a>
@@ -78,50 +145,7 @@
                   <button type="submit" name="snapshot" role="button" class="btn" style="height:50px;width:80px;"><i class="icon-download-alt"></i><br>Snapshot</button>
                   {% endifequal %}
                  </form>
-                <hr>
-                <li>Name & Status</li><br>
-                <div class="pagination-centered">
-                  <p><b>Name:</b> {{ vname }}</p>
-                  <p><b>Status:</b> <font color={% ifequal dom.info.0 5 %}"red">Not Active{% endifequal %}{% ifequal dom.info.0 1 %}"green">Active{% endifequal %}{% ifequal dom.info.0 3 %}"orange">Suspend{% endifequal %}</font></p>
-                  <p><b>Uptime:</b> {{ dom_uptime }} (Min)</p>
-                </div>
-                <hr>
-                <li>Technical Details</li><br>
-                <div class="pagination-centered">
-                  <p><b>VCPU:</b> {{ dom_info.0 }} (Usage: {{ cpu_usage }}%)</p>
-                  <p><b>RAM:</b> {{ dom_info.1 }} MB (Usage: {{ mem_usage.1 }}%)</p>
-                  <p><b>MAC:</b> {{ dom_info.2 }} ({{ dom_info.3 }})</p>
-                  <p><b>HDD:</b> {{ hdd_image.0 }} ({{ hdd_image.1 }})</p>
-                </div>
-                <hr>
-                <li>Media Details</li><br>
-                <div class="pagination-centered">
-                  {% if not media %}{% else %}<b>Connected Image:</b> {{ media }}{% endif %}
-                  <form action="" method="post">{% csrf_token %}
-                    {% if media %}
-                    <br>
-                    <input type="hidden" name="iso_img" value="{{ media }}">
-                    <input type="submit" class="btn"  name="remove_iso" value="Disconnect" onclick="return confirm('Are you sure?')">
-                    {% else %}
-                    <b>Images:</b> <select name="iso_img" class="input-large">
-                    {% if iso_images %}
-                      {% for iso in iso_images %}
-                        <option value="{{ iso }}">{{ iso }}</option>
-                      {% endfor %}
-                    {% else %}
-                      <option value="none">None</option>
-                    {% endif %}
-                    </select>
-                    <br />
-                    {% if iso_images %}
-                    <input type="submit" class="btn" name="add_iso" value="Connect">
-                    {% else %}
-                    <a class="btn disabled" name="connect">Connect</a>
-                    {% endif %}
-                    {% endif %}
-                  </form>
-                </div>
-              </ul>
+              </div>
             </div> <!-- /span7 -->
 
             <div id="rebootModal" class="modal hide fade">

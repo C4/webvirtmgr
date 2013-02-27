@@ -28,7 +28,7 @@
         <tbody>
           {% for instance in instance_list %}
           <tr>
-            <td><strong><a href="/vm/{{ instance.hostid }}/{{ instance.name }}/"><i class="icon-th-large"></i> {{ instance.name }}</a></strong></td>
+            <td><strong><i class="icon-th-large"></i> <a href="/vm/{{ instance.hostid }}/{{ instance.name }}/">{{ instance.name }}</a></strong></td>
             <td>{{ instance.ip }}</td>
             <td>{{ instance.instanceid }}</td>
             <td style="width: 80px;">{{ instance.fqdn }}</td>

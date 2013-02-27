@@ -20,9 +20,9 @@ urlpatterns = patterns('',
     url(r'^network/(\d+)/$', 'polls.views.network', {'pool': None}),
     url(r'^network/(\d+)/(\w+)/$', 'polls.views.network'),
 
-    url(r'^vm/(\d+)/([\w-])+/$', 'polls.views.vm'),
+    url(r'^vm/(\d+)/([\w-]+)/$', 'polls.views.vm'),
 
-    url(r'^vnc/(\d+)/(\w+)/$', 'polls.views.vnc'),
+    url(r'^vnc/(\d+)/([\w-]+)/$', 'polls.views.vnc'),
 
     url(r'^snapshot/(\d+)/$', 'polls.views.snapshot'),
     url(r'^snapshot/(\d+)/(\w+)/$', 'polls.views.dom_snapshot'),
