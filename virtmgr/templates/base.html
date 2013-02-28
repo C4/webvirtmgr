@@ -83,15 +83,8 @@
     <script src="/{{ STATIC_URL }}js/bootstrap.js"></script>
     <script src="/{{ STATIC_URL }}js/jquery.dataTables.js"></script>
     <script src="/{{ STATIC_URL }}js/DT_bootstrap.js"></script>
-    <script type="text/javascript">
-      $.extend( $.fn.dataTableExt.oStdClasses, {
-          "sWrapper": "dataTables_wrapper form-inline"
-      } );
-      $(document).ready(function() {
-          $('#instance_list').dataTable( {
-              "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-          } );
-      } );      
-    </script>
+
+    {% block javascript %}{% endblock %}
+
   </body>
 </html>

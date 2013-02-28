@@ -16,23 +16,26 @@
         <thead>
           <tr>
             <th>Hostname</th>
-            <th>Instance ID</th>
             <th>IP Address</th>
-            <th>FQDN</th>
+            <th>Description</th>
+            <th>Instance ID</th>
+            <th style="display:none;">FQDN</th>
             <th>CPUs</th>
             <th>Memory</th>
             <th>State</th>
             <th>Location</th>
+            <th>Options</th>
           </tr>
         </thead>
         <tbody>
           {% for instance in instance_list %}
           <tr>
             <td><strong><i class="icon-th-large"></i> <a href="/vm/{{ instance.hostid }}/{{ instance.name }}/">{{ instance.name }}</a></strong></td>
-            <td>{{ instance.instanceid }}</td>
             <td>{{ instance.ip }}</td>
-            <td style="width: 80px;">{{ instance.fqdn }}</td>
-            <td style="width: 70px;">{{ instance.cpu }}</td>
+            <td></td>
+            <td><span style="font-size:12px;">{{ instance.instanceid }}</span></td>
+            <td style="display:none;">{{ instance.fqdn }}</td>
+            <td>{{ instance.cpu }}</td>
             <td>{{ instance.mem }}</td>
             <td>
               {% if instance.state == "running" %}
@@ -46,6 +49,12 @@
               {% endif %}
             </td>
             <td>{{ instance.location }}</td>
+            <td>
+              <div class="btn-group">
+                <a class="btn btn-small i-edit" data-toggle="modal" data-id=""><i class="icon-edit"></i></a>
+                <a class="btn btn-small" data-toggle="modal" data-id=""><i class="icon-fullscreen"></i></a>
+              </div>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -54,54 +63,105 @@
         <h4>No Instances found</h4>
         <br>
       {% endif %}
-      <div id="myModal" class="modal hide fade">
+      <div id="InstanceModal" class="modal hide fade">
+        <div class="ModalContent">
           <div class="modal-header">
             <button class="close" data-dismiss="modal">&times;</button>
-              <h3>Add new host sever</h3>
+            <h3></h3>
           </div>
-       <div class="modal-body">
-          <form class="form-horizontal" action="" method="post">{% csrf_token %}
-            <fieldset>
-              <div class="control-group">
-              <label class="control-label">Name</label>
-                <div class="controls">
-                  <input type="text" name="hostname" class="input-large focused" placeholder="Name">
+          <div class="modal-body">
+            <form class="form-horizontal" action="" method="post">{% csrf_token %}
+              <fieldset>
+                <div class="control-group">
+                  <label class="control-label">Name</label>
+                  <div class="controls">
+                    <input type="text" name="hostname" class="input-xlarge" placeholder=""></input>
+                  </div>
+                 </div>
+                <div class="control-group">
+                  <label class="control-label">Instance ID</label>
+                  <div class="controls">
+                    <input type="text" name="instanceid" class="input-xlarge" placeholder=""></input>
+                  </div>
                 </div>
-               </div>
-              <div class="control-group">
-              <label class="control-label">Hostname</label>
-                <div class="controls">
-                  <input type="text" name="ipaddr" class="input-large" placeholder="IP or Domain">
+                <div class="control-group">
+                  <label class="control-label">Description</label>
+                  <div class="controls">
+                    <input type="text" name="description" class="input-xlarge" placeholder=""></input>
+                  </div>
                 </div>
+                <div class="control-group">
+                  <label class="control-label">IP Address</label>
+                  <div class="controls">
+                    <input type="text" name="ip" class="input-xlarge" placeholder=""></input>
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label">FQDN</label>
+                  <div class="controls">
+                    <input type="text" name="fqdn" class="input-xlarge" placeholder=""></input>
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label">Number of CPUs</label>
+                  <div class="controls">
+                    <input type="text" name="cpu" class="input-xlarge" placeholder=""></input>
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label">Memory</label>
+                  <div class="controls">
+                    <input type="text" name="memory" class="input-xlarge" placeholder=""></input>
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label">State</label>
+                  <div class="controls">
+                    <input type="text" name="state" class="input-xlarge" placeholder=""></input>
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label">Instance Location</label>
+                  <div class="controls">
+                    <input type="text" name="location" class="input-xlarge" placeholder=""></input>
+                  </div>
+                </div>
+              </fieldset>
+          </div>    
+              <div class="modal-footer">
+                <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+                  <input type="submit" class="btn btn-success" name="add_host" value="Add">
               </div>
-              <div class="control-group">
-              <label class="control-label">KVM login</label>
-                <div class="controls">
-                  <input type="text" name="kvm_login" class="input-large" placeholder="login">
-                </div>
-              </div>
-              <div class="control-group">
-              <label class="control-label">KVM password</label>
-                <div class="controls">
-                  <input type="password" name="kvm_passwd" class="input-large" placeholder="******">
-                </div>
-              </div>
-              <div class="control-group">
-              <label class="control-label">Connection Type</label>
-                <div class="controls">
-                  <select name="connection_type">
-                    <option value="tcp">qemu+tcp</option>
-                    <option value="ssh">qemu+ssh</option>
-                  </select>
-                </div>
-              </div>
-            </fieldset>
-          </div>
-          <div class="modal-footer">
-            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-              <input type="submit" class="btn btn-success" name="add_host" value="Add">
-           </form>
-          </div>
+            </form>
+          
         </div>
       </div>
+    </div>
+{% endblock %}
+{% block javascript %}
+      <script type="text/javascript">
+        $.extend( $.fn.dataTableExt.oStdClasses, {
+            "sWrapper": "dataTables_wrapper form-inline"
+        } );
+        $(document).ready(function() {
+            $('#instance_list').dataTable( {
+                "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
+            } );
+            $(".i-edit").click(function(){
+               // Get the elements from the table row and populating the modal
+                $('#InstanceModal').modal('show');
+                $('.modal-header h3').empty().append($(this).closest('tr').find('td:eq(0)').text());
+                $('input[name="hostname"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(0)').text());
+                $('input[name="ip"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(1)').text());
+                $('input[name="description"]').prop('disabled', false).val($(this).closest('tr').find('td:eq(2)').text());
+                $('input[name="instanceid"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(3)').text());
+                $('input[name="fqdn"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(4)').text());
+                $('input[name="cpu"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(5)').text());
+                $('input[name="memory"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(6)').text());
+                $('input[name="state"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(7)').text());
+                $('input[name="location"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(8)').text());
+           });
+
+        });      
+      </script>
 {% endblock %}
