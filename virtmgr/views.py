@@ -234,7 +234,7 @@ def dashboard(request):
             connection_type = request.POST.get('connection_type', '')
 
             import re
-            simbol = re.search('[^a-zA-Z0-9\-]+', name)
+            simbol = re.search('[^a-zA-Z0-9\-\.]+', name)
             ipsimbol = re.search('[^a-z0-9\.\-]+', ipaddr)
             domain = re.search('[\.]+', ipaddr)
 
@@ -578,7 +578,7 @@ def newvm(request, host_id):
                 errors = []
 
                 import re
-                simbol = re.search('[^a-zA-Z0-9\_]+', vname)
+                simbol = re.search('[^a-zA-Z0-9\_\-\.]+', vname)
 
                 if vname in all_vm:
                     msg = 'This is the name of the virtual machine already exists'
@@ -760,7 +760,7 @@ def storage(request, host_id, pool):
 
         storages = all_storages()
 
-        if pool == None:
+        if pool is None:
             if len(storages) == 0:
                 return HttpResponseRedirect('/storage/%s/add/' % (host_id))
             else:
@@ -776,7 +776,7 @@ def storage(request, host_id, pool):
 
                     import re
                     errors = []
-                    name_have_simbol = re.search('[^a-zA-Z0-9\_]+', pool_name)
+                    name_have_simbol = re.search('[^a-zA-Z0-9\_\-]+', pool_name)
                     path_have_simbol = re.search('[^a-zA-Z0-9\/]+', pool_source)
 
                     if name_have_simbol or path_have_simbol:
@@ -818,7 +818,7 @@ def storage(request, host_id, pool):
             info = stg_info()
 
             # refresh storage if acitve
-            if info[5] == True:
+            if info[5] is True:
                 stg.refresh(0)
                 volumes_info = stg_vol()
 
@@ -849,7 +849,7 @@ def storage(request, host_id, pool):
 
                     import re
                     errors = []
-                    name_have_simbol = re.search('[^a-zA-Z0-9\_\-]+', name)
+                    name_have_simbol = re.search('[^a-zA-Z0-9\_\-\.]+', name)
                     if img_name in stg.listVolumes():
                         msg = 'Volume name already use'
                         errors.append(msg)
@@ -880,7 +880,7 @@ def storage(request, host_id, pool):
                     full_img_name = clone_name + '.img'
                     import re
                     errors = []
-                    name_have_simbol = re.search('[^a-zA-Z0-9\_]+', clone_name)
+                    name_have_simbol = re.search('[^a-zA-Z0-9\_\-\.]+', clone_name)
                     if full_img_name in stg.listVolumes():
                         msg = _('Volume name already use')
                         errors.append(msg)
@@ -959,19 +959,19 @@ def network(request, host_id, pool):
 
         ipv4 = []
         xml_net = net.XMLDesc(0)
-        
+
         fw = util.get_xml_path(xml_net, "/network/forward/@mode")
         forwardDev = util.get_xml_path(xml_net, "/network/forward/@dev")
-        
+
         if fw and forwardDev:
             ipv4.append([fw, forwardDev])
         else:
             ipv4.append(None)
-        
+
         # Subnet block
         addrStr = util.get_xml_path(xml_net, "/network/ip/@address")
         netmaskStr = util.get_xml_path(xml_net, "/network/ip/@netmask")
-        
+
         if addrStr and netmaskStr:
             netmask = IP(netmaskStr)
             gateway = IP(addrStr)
@@ -979,11 +979,11 @@ def network(request, host_id, pool):
             ipv4.append(IP(str(network) + "/" + netmaskStr))
         else:
             ipv4.append(None)
-        
+
         # DHCP block
         dhcpstart = util.get_xml_path(xml_net, "/network/ip/dhcp/range[1]/@start")
         dhcpend = util.get_xml_path(xml_net, "/network/ip/dhcp/range[1]/@end")
-        
+
         if not dhcpstart or not dhcpend:
             pass
         else:
@@ -999,7 +999,7 @@ def network(request, host_id, pool):
 
         networks = all_networks()
 
-        if pool == None:
+        if pool is None:
             if len(networks) == 0:
                 return HttpResponseRedirect('/network/%s/add/' % (host_id))
             else:
@@ -1016,7 +1016,7 @@ def network(request, host_id, pool):
 
                     import re
                     errors = []
-                    name_have_simbol = re.search('[^a-zA-Z0-9\_]+', pool_name)
+                    name_have_simbol = re.search('[^a-zA-Z0-9\_\-]+', pool_name)
                     ip_have_simbol = re.search('[^0-9\.\/]+', net_addr)
 
                     if not pool_name:
@@ -1027,7 +1027,7 @@ def network(request, host_id, pool):
                         errors.append(msg)
                     else:
                         if name_have_simbol:
-                            msg = 'The pool name must not contain any characters and Russian characters'
+                            msg = 'The pool name must not contain any characters'
                             errors.append(msg)
                     if not net_addr:
                         msg = 'No subnet has been entered'
@@ -1075,7 +1075,7 @@ def network(request, host_id, pool):
 
             info = net_info()
 
-            if info[0] == True:
+            if info[0] is True:
                 ipv4_net = ipv4_net()
 
             if request.method == 'POST':
