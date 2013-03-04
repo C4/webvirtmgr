@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
     <h2>Instances</h2>
+    <div class="pull-right" style="margin-top: -44px;"><a class="btn btn-success create-instance" data-toggle="modal">Create Instance</a></div>
     <hr>
     {% if errors %}
       {% for error in errors %}
@@ -134,6 +135,44 @@
               </div>
             </form>
           
+          </div>
+        </div>
+      </div>
+      <div id="CreateInstance" class="modal hide fade">
+        <div class="ModalContent">
+          <div class="modal-header">
+            <button class="close" data-dismiss="modal">&times;</button>
+            <h3>Launch Instance</h3>
+          </div>
+          <div class="modal-body">
+            <form class="form-stacked">
+                <div class="row-fluid">
+                  <div class="span6">
+                    <div class="control-group" >
+                        <label class="control-label">Server Name</label>
+                        <div class="controls">
+                            <input class="span12" type="text" name="first" />
+                        </div>
+                    </div>
+                    <div class="control-group" >
+                        <label class="control-label">Domain</label>
+                        <div class="controls">
+                            <input class="span12" type="text" name="domain" placeholder="int.exmaple.com" />
+                        </div>
+                    </div>
+                  </div>
+                  <div class="span6">
+                    <b>Description</b><br />
+                    Specify the details for launching an instance.
+                    </div>
+                </div>
+          </div>    
+              <div class="modal-footer">
+                <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+                  <input type="submit" class="btn btn-success" name="add_host" value="Launch Instance">
+              </div>
+            </form>
+          
         </div>
       </div>
     </div>
@@ -160,8 +199,10 @@
                 $('input[name="memory"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(6)').text());
                 $('input[name="state"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(7)').text());
                 $('input[name="location"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(8)').text());
-           });
-
+            });
+            $(".create-instance").click(function(){
+              $('#CreateInstance').modal('show');
+            });
         });      
       </script>
 {% endblock %}
