@@ -2,6 +2,10 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
+from django.core import serializers
+from django.utils import simplejson as json
+from django.http import HttpResponse
+from django.forms import model_to_dict
 from webvirtmgr.virtmgr.models import *
 import sys
 
@@ -1536,3 +1540,47 @@ def dom_snapshot(request, host_id, vname):
 
 def page_setup(request):
     return render_to_response('setup.html', locals(), context_instance=RequestContext(request))
+
+def service(request, resource):
+    ## the /service route will serve as a json api to get data from the backend. This will allow pages to request info easier.
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/login')
+    data = {}
+
+    # the /hosts route will return data about the hosts that are configured for this server. 
+    if resource == "hosts":
+        try:    
+            hosts = Host.objects.values()
+            h = []
+            for host in hosts:              
+                h.append({"id":host['id'],"name":host['hostname'],"ip_address":host['ipaddr'],"connection_type":host['connection_type'],"login_user":host['login']})           
+            data.update({"status":"success","data":h})
+        except:
+            data.update({"status":"error","data":"There was an error retrieving host information."})
+
+    # the /instances route will return data about the instances that are on the host servers. 
+    if resource == "instances":           
+        try:    
+            hosts = Host.objects.values()
+            instance_list = []
+            hosts = Host.objects.filter()
+            for host in hosts: # Looping through all of the hosts to find all of the vms lists. This should get cahced somewhere.
+                conn = libvirt_conn(host)
+                instances = get_all_vm_info(conn,host)
+                if type(instances) is list:
+                    for instance in instances:
+                        instance_list.append({"id":instance['instanceid'],"host_id":instance['hostid'],"name":instance['name'],"ip":instance['ip'],"state":instance['state'],"memory":instance['mem'],"cpu_number":instance['cpu'],"location":instance['location'],"virtualization_type":instance['hypervisor'],"dns_name":instance['fqdn']})    
+         
+            data.update({"status":"success","data":instance_list})
+
+                
+            errors = []
+        except:
+            data.update({"status":"error","data":"There was an error retrieving instance information."})
+
+
+    return HttpResponse(json.dumps(data), 'application/json')
+
+
+
+

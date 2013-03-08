@@ -30,4 +30,6 @@ urlpatterns = patterns('',
     url(r'^setup/$', 'virtmgr.views.page_setup', name='page_setup'),
 
     url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT, 'show_indexes': False}),
+
+    url(r'^service/(\w+)/$', 'webvirtmgr.virtmgr.views.service'),    
 )

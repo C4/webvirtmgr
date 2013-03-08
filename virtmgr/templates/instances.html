@@ -151,20 +151,29 @@
                     <div class="control-group" >
                         <label class="control-label">Server Name</label>
                         <div class="controls">
-                            <input class="span12" type="text" name="first" />
+                            <input class="span12" type="text" name="create_name" />
                         </div>
                     </div>
                     <div class="control-group" >
                         <label class="control-label">Domain</label>
                         <div class="controls">
-                            <input class="span12" type="text" name="domain" placeholder="int.exmaple.com" />
+                            <input class="span12" type="text" name="create_domain" placeholder="int.exmaple.com" />
+                        </div>
+                    </div>
+                    <div class="control-group" >
+                        <label class="control-label">Location</label>
+                        <div class="controls">
+                          <div class="controls">
+                            <select class="span12" name="create_location">
+                            </select>
+                          </div>                          
                         </div>
                     </div>
                   </div>
                   <div class="span6">
                     <b>Description</b><br />
                     Specify the details for launching an instance.
-                    </div>
+                  </div>
                 </div>
           </div>    
               <div class="modal-footer">
@@ -184,6 +193,7 @@
         } );
         $(document).ready(function() {
             $('#instance_list').dataTable( {
+                "aLengthMenu": [[30, 100, -1],[30, 100, "All"]],
                 "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
             } );
             $(".i-edit").click(function(){
@@ -202,6 +212,14 @@
             });
             $(".create-instance").click(function(){
               $('#CreateInstance').modal('show');
+              $.get("/service/hosts", function (data){
+                if (data.status == "success"){
+                  hosts = data.data
+                  for (var i = 0; i < hosts.length; i++) {
+                    $('select[name="create_location"]').append("<option value=\""+hosts[i].name+"\">"+hosts[i].name+"</option>");   
+                  }               
+                }
+              });
             });
         });      
       </script>
