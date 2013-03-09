@@ -52,8 +52,14 @@
             <td>{{ instance.location }}</td>
             <td>
               <div class="btn-group">
-                <a class="btn btn-small i-edit" data-toggle="modal" data-id=""><i class="icon-edit"></i></a>
-                <a class="btn btn-small" data-toggle="modal" data-id=""><i class="icon-fullscreen"></i></a>
+                <button class="btn i-edit" data-toggle="modal">Edit Instance</button>
+                <button class="btn dropdown-toggle" data-toggle="dropdown">
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a href="" class="i-edit" data-toggle="modal">Edit Instance</a></li>
+                  <li><a href="" class="">VNC Console</a></li>
+                </ul>
               </div>
             </td>
           </tr>
