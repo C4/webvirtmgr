@@ -1571,13 +1571,29 @@ def service(request, resource):
                     for instance in instances:
                         instance_list.append({"id":instance['instanceid'],"host_id":instance['hostid'],"name":instance['name'],"ip":instance['ip'],"state":instance['state'],"memory":instance['mem'],"cpu_number":instance['cpu'],"location":instance['location'],"virtualization_type":instance['hypervisor'],"dns_name":instance['fqdn']})    
          
-            data.update({"status":"success","data":instance_list})
-
-                
-            errors = []
+            data.update({"status":"success","data":instance_list}) 
         except:
             data.update({"status":"error","data":"There was an error retrieving instance information."})
 
+    if resource == "instance_types":
+        try:    
+            itypes = InstanceTypes.objects.values()
+            h = []
+            for itype in itypes:              
+                h.append({"id":itype['itid'],"name":itype['name'],"cpu_number":itype['cpu'],"memory":itype['memory'],"disk_size":itype['disk']})           
+            data.update({"status":"success","data":h})
+        except:
+            data.update({"status":"error","data":"There was an error retrieving instance type information."})
+
+    if resource == "os_types":
+        try:    
+            ostypes = OSTypes.objects.values()
+            h = []
+            for ostype in ostypes:              
+                h.append({"id":ostype['osid'],"name":ostype['name'],"version":ostype['version'],"description":ostype['description']})           
+            data.update({"status":"success","data":h})
+        except:
+            data.update({"status":"error","data":"There was an error retrieving os type information."})
 
     return HttpResponse(json.dumps(data), 'application/json')
 

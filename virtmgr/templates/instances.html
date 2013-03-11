@@ -11,9 +11,15 @@
         </div>
       {% endfor %}
     {% endif %}
-    {% if instance_list %}
-    <div>
-      <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="instance_list">
+    <div class="main-display">
+      <div class="loading">
+        <div class="row-fluid">
+          <div class="span12 pagination-centered">        
+            <img src="/static/img/loading.gif" /><br /><h4>Loading...</h4>
+          </div>
+        </div>  
+      </div>
+      <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered hide" id="instance_list">
         <thead>
           <tr>
             <th>Hostname</th>
@@ -29,47 +35,8 @@
           </tr>
         </thead>
         <tbody>
-          {% for instance in instance_list %}
-          <tr>
-            <td><strong><i class="icon-th-large"></i> <a href="/vm/{{ instance.hostid }}/{{ instance.name }}/">{{ instance.name }}</a></strong></td>
-            <td>{{ instance.ip }}</td>
-            <td></td>
-            <td><span style="font-size:12px;">{{ instance.instanceid }}</span></td>
-            <td style="display:none;">{{ instance.fqdn }}</td>
-            <td>{{ instance.cpu }}</td>
-            <td>{{ instance.mem }}</td>
-            <td>
-              {% if instance.state == "running" %}
-                <font color="green">{{ instance.state }}</font>
-              {% else %}
-                {% if instance.state == "shut off" %}
-                  <font color="red">{{ instance.state }}</font>
-                {% else %}
-                  {{ instance.state }}
-                {% endif %}
-              {% endif %}
-            </td>
-            <td>{{ instance.location }}</td>
-            <td>
-              <div class="btn-group">
-                <button class="btn i-edit" data-toggle="modal">Edit Instance</button>
-                <button class="btn dropdown-toggle" data-toggle="dropdown">
-                  <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a href="" class="i-edit" data-toggle="modal">Edit Instance</a></li>
-                  <li><a href="" class="">VNC Console</a></li>
-                </ul>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
         </tbody>
       </table>
-      {% else %}
-        <h4>No Instances found</h4>
-        <br>
-      {% endif %}
       <div id="InstanceModal" class="modal hide fade">
         <div class="ModalContent">
           <div class="modal-header">
@@ -151,36 +118,109 @@
             <h3>Launch Instance</h3>
           </div>
           <div class="modal-body">
+            <div class="tabbable"> <!-- Only required for left/right tabs -->
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#details_tab" data-toggle="tab">Details</a></li>
+                <li><a href="#network_tab" data-toggle="tab">Network</a></li>
+                <li><a href="#configuration_tab" data-toggle="tab">Configuration</a></li>
+              </ul>
+            </div>
             <form class="form-stacked">
-                <div class="row-fluid">
-                  <div class="span6">
-                    <div class="control-group" >
-                        <label class="control-label">Server Name</label>
-                        <div class="controls">
-                            <input class="span12" type="text" name="create_name" />
-                        </div>
-                    </div>
-                    <div class="control-group" >
-                        <label class="control-label">Domain</label>
-                        <div class="controls">
-                            <input class="span12" type="text" name="create_domain" placeholder="int.exmaple.com" />
-                        </div>
-                    </div>
-                    <div class="control-group" >
-                        <label class="control-label">Location</label>
-                        <div class="controls">
+              <div class="tab-content">
+                <div class="tab-pane active" id="details_tab">
+                  <div class="row-fluid">
+                    <div class="span6">
+                      <div class="control-group" >
+                          <label class="control-label">Server Name</label>
                           <div class="controls">
-                            <select class="span12" name="create_location">
-                            </select>
-                          </div>                          
-                        </div>
+                              <input class="span12" type="text" name="create_name" />
+                          </div>
+                      </div>
+                      <div class="control-group" >
+                          <label class="control-label">Domain</label>
+                          <div class="controls">
+                              <input class="span12" type="text" name="create_domain" placeholder="int.exmaple.com" />
+                          </div>
+                      </div>
+                      <div class="control-group" >
+                          <label class="control-label">Location</label>
+                          <div class="controls">
+                            <div class="controls">
+                              <select class="span12" name="create_location">
+                              </select>
+                            </div>                          
+                          </div>
+                      </div>
+                      <div class="control-group" >
+                          <label class="control-label">Instance Type</label>
+                          <div class="controls">
+                            <div class="controls">
+                              <select class="span12" name="create_instance_type">
+                              </select>
+                            </div>                          
+                          </div>
+                      </div>
+                      <div class="control-group" >
+                          <label class="control-label">OS Type</label>
+                          <div class="controls">
+                            <div class="controls">
+                              <select class="span12" name="create_os_type">
+                              </select>
+                            </div>                          
+                          </div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="span6">
-                    <b>Description</b><br />
-                    Specify the details for launching an instance.
+                    <div class="span6">
+                      <b>Description</b><br />
+                      Specify the details for launching an instance.
+                    </div>
                   </div>
                 </div>
+                <div class="tab-pane" id="network_tab">
+                  <div class="row-fluid">
+                    <div class="span6">
+                      <div class="control-group" >
+                          <label class="control-label">IP Address</label>
+                          <div class="controls">
+                              <input class="span12" type="text" name="create_ip_address" placeholder="" />
+                          </div>
+                      </div>
+                      <div class="control-group" >
+                          <label class="control-label">Network Mask</label>
+                          <div class="controls">
+                              <input class="span12" type="text" name="create_network_mask" placeholder="255.25.255.0" />
+                          </div>
+                      </div>
+                      <div class="control-group" >
+                          <label class="control-label">Gateway</label>
+                          <div class="controls">
+                              <input class="span12" type="text" name="create_gateway" placeholder="" />
+                          </div>
+                      </div>                    
+                    </div>
+                    <div class="span6">
+                      <b>Description</b><br />
+                      Specify the network details for the instance.
+                    </div>
+                  </div>  
+                </div>
+                <div class="tab-pane" id="configuration_tab">
+                  <div class="row-fluid">
+                    <div class="span6">
+                      <div class="control-group" >
+                          <label class="control-label">Roles</label>
+                          <div class="controls">
+                              <input class="span12" type="text" name="create_roles" placeholder="" />
+                          </div>
+                      </div>                   
+                    </div>
+                    <div class="span6">
+                      <b>Description</b><br />
+                      Specify the configutation details for the instance.
+                    </div>
+                  </div>  
+                </div>
+              </div>
           </div>    
               <div class="modal-footer">
                 <a href="#" class="btn" data-dismiss="modal">Cancel</a>
@@ -197,11 +237,52 @@
         $.extend( $.fn.dataTableExt.oStdClasses, {
             "sWrapper": "dataTables_wrapper form-inline"
         } );
-        $(document).ready(function() {
-            $('#instance_list').dataTable( {
-                "aLengthMenu": [[30, 100, -1],[30, 100, "All"]],
-                "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
-            } );
+        $(document).ready(function() {    
+            $.get("/service/instances", function (data){
+              if (data.status == "success"){
+                instances = data.data
+                $('#instance_list').show();
+                $('#instance_list tbody').empty();
+                $(".loading").hide();
+                for (var i = 0; i < instances.length; i++) {
+                  var dstate; 
+                  if (instances[i].state == "running"){ dstate = '<font color="green">'+instances[i].state+'</font>';}
+                  else if (instances[i].state == "shut off"){ dstate = '<font color="red">'+instances[i].state+'</font>';}
+                  else { dstate = instances[i].state;}
+                  $('#instance_list tbody').append('<tr>\
+                      <td><strong><i class="icon-th-large"></i> <a href="/vm/'+instances[i].host_id+'/'+instances[i].name+'">'+instances[i].name+'</a></strong></td>\
+                      <td>'+instances[i].ip+'</td>\
+                      <td></td>\
+                      <td><span style="font-size:12px;">'+instances[i].id+'</span></td>\
+                      <td style="display:none;">'+instances[i].fqdn+'</td>\
+                      <td>'+instances[i].cpu_number+'</td>\
+                      <td>'+instances[i].memory+'</td>\
+                      <td>'+dstate+'</td>\
+                      <td>'+instances[i].location+'</td>\
+                      <td>\
+                        <div class="btn-group">\
+                          <button class="btn i-edit" data-toggle="modal">Edit Instance</button>\
+                          <button class="btn dropdown-toggle" data-toggle="dropdown">\
+                            <span class="caret"></span>\
+                          </button>\
+                          <ul class="dropdown-menu">\
+                            <li><a href="" class="i-edit" data-toggle="modal">Edit Instance</a></li>\
+                            <li><a href="" class="">VNC Console</a></li>\
+                          </ul>\
+                        </div>\
+                      </td>\
+                    </tr>');   
+                }  
+                $('#instance_list').dataTable( {
+                    "aLengthMenu": [[30, 100, -1],[30, 100, "All"]],
+                    "iDisplayLength": 30,
+                    "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>"
+                } );                             
+              }else{
+                $("#instance_list").hide();
+                $(".loading").hide().empty().append("<h4>No Instances found.</h4>")
+              }
+            }); 
             $(".i-edit").click(function(){
                // Get the elements from the table row and populating the modal
                 $('#InstanceModal').modal('show');
@@ -217,16 +298,42 @@
                 $('input[name="location"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(8)').text());
             });
             $(".create-instance").click(function(){
-              $('#CreateInstance').modal('show');
+              $('#CreateInstance').modal('show').css({
+                 'width': function () { 
+                     return ($(document).width() * .5) + 'px';  
+                 },
+                 'margin-left': function () { 
+                     return -($(this).width() / 2); 
+                 }
+              });
               $.get("/service/hosts", function (data){
                 if (data.status == "success"){
                   hosts = data.data
+                  $('select[name="create_location"]').empty();
                   for (var i = 0; i < hosts.length; i++) {
                     $('select[name="create_location"]').append("<option value=\""+hosts[i].name+"\">"+hosts[i].name+"</option>");   
                   }               
                 }
               });
-            });
+              $.get("/service/instance_types", function (data){
+                if (data.status == "success"){
+                  itypes = data.data
+                  $('select[name="create_instance_type"]').empty();
+                  for (var i = 0; i < itypes.length; i++) {
+                    $('select[name="create_instance_type"]').append("<option value=\""+itypes[i].name+"\">"+itypes[i].name+" ( "+itypes[i].cpu_number+" vCPU / "+itypes[i].memory+"MB Ram / "+itypes[i].disk_size+"GB Disk )</option>");   
+                  }               
+                }
+              });
+              $.get("/service/os_types", function (data){
+                if (data.status == "success"){
+                  ostypes = data.data
+                  $('select[name="create_os_type"]').empty();
+                  for (var i = 0; i < itypes.length; i++) {
+                    $('select[name="create_os_type"]').append("<option value=\""+ostypes[i].name+"\">"+ostypes[i].name+" "+ostypes[i].version+" "+ostypes[i].description+"</option>");   
+                  }               
+                }
+              });
+            });                     
         });      
       </script>
 {% endblock %}

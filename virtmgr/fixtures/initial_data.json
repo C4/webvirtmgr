@@ -1,0 +1,77 @@
+[
+  {
+    "model": "virtmgr.instancetypes",
+    "pk": 1,
+    "fields": {
+      "itid": "1", 
+      "name": "m1.micro",
+      "cpu": "1",
+      "memory": "1024",
+      "disk": "10"      
+    }
+  },
+  {
+    "model": "virtmgr.instancetypes",
+    "pk": 2,
+    "fields": {
+      "itid": "2", 
+      "name": "m1.small",
+      "cpu": "2",
+      "memory": "2048",
+      "disk": "20"      
+    }
+  },
+  {
+    "model": "virtmgr.instancetypes",
+    "pk": 3,
+    "fields": {
+      "itid": "3", 
+      "name": "m1.medium",
+      "cpu": "3",
+      "memory": "4096",
+      "disk": "30"      
+    }
+  },
+  {
+    "model": "virtmgr.instancetypes",
+    "pk": 4,
+    "fields": {
+      "itid": "4", 
+      "name": "m1.large",
+      "cpu": "4",
+      "memory": "8192",
+      "disk": "50"      
+    }
+  },
+  {
+    "model": "virtmgr.instancetypes",
+    "pk": 5,
+    "fields": {
+      "itid": "5", 
+      "name": "m1.xlarge",
+      "cpu": "6",
+      "memory": "16384",
+      "disk": "100"      
+    }
+  },
+  {
+    "model": "virtmgr.ostypes",
+    "pk": 1,
+    "fields": {
+      "osid": "1",      
+      "name": "Ubuntu",
+      "version": "12.04",
+      "description": "(LTS)"      
+    }
+  },
+  {
+    "model": "virtmgr.ostypes",
+    "pk": 2,
+    "fields": {
+      "osid": "2",
+      "name": "CentOS",
+      "version": "6.3",
+      "description": ""      
+    }
+  }
+]
