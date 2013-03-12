@@ -283,10 +283,10 @@
                 $(".loading").hide().empty().append("<h4>No Instances found.</h4>")
               }
             }); 
-            $(".i-edit").click(function(){
+            $(".i-edit").live("click", function(){
                // Get the elements from the table row and populating the modal
                 $('#InstanceModal').modal('show');
-                $('.modal-header h3').empty().append($(this).closest('tr').find('td:eq(0)').text());
+                $('#InstanceModal .modal-header h3').empty().append($(this).closest('tr').find('td:eq(0)').text());
                 $('input[name="hostname"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(0)').text());
                 $('input[name="ip"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(1)').text());
                 $('input[name="description"]').prop('disabled', false).val($(this).closest('tr').find('td:eq(2)').text());

@@ -18,12 +18,14 @@ class Vm(models.Model):
     def __unicode__(self):
         return self.vname
 
-class InstanceMetaData(models.Model):
+class Tags(models.Model):
     name = models.CharField(max_length=32)
+    instanceid = models.CharField(max_length=64)
     ip = models.IPAddressField()
     owner = models.CharField(max_length=32)
     team = models.CharField(max_length=32)
     project = models.CharField(max_length=32)
+    environment = models.CharField(max_length=32)
     def __unicode__(self):
         return self.hostname
 
