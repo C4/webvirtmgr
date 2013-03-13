@@ -3,14 +3,6 @@
     <h2>Instances</h2>
     <div class="pull-right" style="margin-top: -44px;"><a class="btn btn-success create-instance" data-toggle="modal">Create Instance</a></div>
     <hr>
-    {% if errors %}
-      {% for error in errors %}
-        <div class="span6 alert alert-block alert-error">
-          <a class="close" data-dismiss="alert">&times;</a>
-          {{ error }}
-        </div>
-      {% endfor %}
-    {% endif %}
     <div class="main-display">
       <div class="loading">
         <div class="row-fluid">
@@ -123,6 +115,7 @@
                 <li class="active"><a href="#details_tab" data-toggle="tab">Details</a></li>
                 <li><a href="#network_tab" data-toggle="tab">Network</a></li>
                 <li><a href="#configuration_tab" data-toggle="tab">Configuration</a></li>
+                <li><a href="#tags_tab" data-toggle="tab">Metadata Tags</a></li>
               </ul>
             </div>
             <form class="form-stacked">
@@ -217,6 +210,40 @@
                     <div class="span6">
                       <b>Description</b><br />
                       Specify the configutation details for the instance.
+                    </div>
+                  </div>  
+                </div>
+                <div class="tab-pane" id="tags_tab">
+                  <div class="row-fluid">
+                    <div class="span6">
+                      <div class="control-group" >
+                          <label class="control-label">Environment</label>
+                          <div class="controls">
+                              <input class="span12" type="text" name="create_environment" placeholder="" />
+                          </div>
+                      </div>
+                      <div class="control-group" >
+                          <label class="control-label">Project</label>
+                          <div class="controls">
+                              <input class="span12" type="text" name="create_project" placeholder="" />
+                          </div>
+                      </div>
+                      <div class="control-group" >
+                          <label class="control-label">Team</label>
+                          <div class="controls">
+                              <input class="span12" type="text" name="create_team" placeholder="" />
+                          </div>
+                      </div>
+                      <div class="control-group" >
+                          <label class="control-label">Owner</label>
+                          <div class="controls">
+                              <input class="span12" type="text" name="create_owner" placeholder="" />
+                          </div>
+                      </div>
+                    </div>
+                    <div class="span6">
+                      <b>Description</b><br />
+                      Specify the Metadata Tags for the instance.
                     </div>
                   </div>  
                 </div>

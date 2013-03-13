@@ -165,23 +165,9 @@ def index(request):
 def instances(request):
     """
 
-    Instances page.
+    This is the instances page. Everything here is now done through ajax calls so there is really nothing to do on page load other than load html.
 
     """
-
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('/login')
-
-    instance_list = []
-    hosts = Host.objects.filter()
-    for host in hosts: # Looping through all of the hosts to find all of the vms lists. This should get cahced somewhere.
-        conn = libvirt_conn(host)
-        instances = get_all_vm_info(conn,host)
-        if type(instances) is list:
-            instance_list = instance_list + instances # Should be a full list of the instances / vms
-
-    #print >>sys.stderr, instance_list    
-    errors = []
 
     return render_to_response('instances.html', locals(), context_instance=RequestContext(request))    
 
