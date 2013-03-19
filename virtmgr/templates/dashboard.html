@@ -13,7 +13,12 @@
         </div>
       {% endfor %}
     {% endif %}
-    <a data-toggle="modal" href="#myModal" class="btn btn-success">Add Connections</a>
+    <a data-toggle="modal" href="#myModal" class="btn btn-success">Add Connection</a>
+    {% if host_info %}
+    <a href="/clusters/" class="btn btn-success">Infrastrusture</a>
+    {% else %}
+    <a href="/clusters/" class="btn btn-success disabled">Infrastrusture</a>
+    {% endif %}
     <br><br>
     {% if host_info %}
     <div>

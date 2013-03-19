@@ -163,9 +163,7 @@
                          <label class="radio">
                           <input type="radio" name="power" value="shutdown"/>Shutdown</label>
                          <label class="radio">
-                          <input type="radio" name="power" value="destroy"/>Halt</label>
-                         <label class="radio">
-                          <input type="radio" name="power" value="reboot"/>Reboot</label>
+                          <input type="radio" name="power" value="destroy"/>Force Shutdown</label>
                       </div>
                     </div>
                   </fieldset>
@@ -178,19 +176,26 @@
             </div> <!-- /rebootModal -->
 
             <div id="deleteModal" class="modal hide fade">
+              <form class="form-horizontal" action="" method="post">{% csrf_token %}
               <div class="modal-header">
-                <form class="form-horizontal" action="" method="post">{% csrf_token %}
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h3 id="deleteModalLabel"> Undefined {{ vname }}</h3>
               </div>
               <div class="modal-body">
-                <p>By deleting the following Virtual Machine will not delete your HDD image.</p>
+                  <fieldset>
+                    <p>Delete HDD Image?</p>
+                    <div class="control-group">
+                      <label class="checkbox">
+                        <input type="checkbox" name="image" value="{{ hdd_image.0 }}"> {{ hdd_image.0 }}
+                      </label>
+                    </div>
+                  </fieldset>
               </div>
               <div class="modal-footer">
                   <button class="btn" data-dismiss="modal">Cancel</button>
                   <input class="btn btn-danger" type="submit" name="delete" value="Delete">
-                </form>
               </div>
+              </form>
             </div> <!-- /deleteModal -->
 
           </div><!--/span-->

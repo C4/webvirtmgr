@@ -2,13 +2,19 @@
 
 This version of 27.02.2013 - does not support update only the new installation. Or you can upgrade an existing but it will have to delete the file <b>webvirtmgr.db</b> and recreate datebase <code>./manage.py syncdb</code>
 
-# WebVirtMgr panel - v1.1
+# WebVirtMgr panel - v1.6
 
 * Add support VM name with dash ("-")
-
+* Add support VM and Host name with dash (".")
+* Delete VM optional HDD image.
+* Add Support NoVNC (need install - CentOS/RedHat/Fedora: python-websockify, Ubuntu: novnc)
+* Add page infrastructure (View all Hosts and VMs)
+* Add button "Enable noVNC" on VM page (Set VNC password for noNVC)
+* Add button "New Flavor" - create custom flavor (after update need - ./manage.py syncdb)
+ 
 ## 1. Introduction
 
-WebVirtMgr is a libvirt-based Web interface for managing virtual machines. It allows you to create and configure new domains, and adjust a domain's resource allocation. A VNC viewer over a SSH tunnel presents a full graphical console to the guest domain. KVM is currently the only hypervisor supported.
+WebVirtMgr is a libvirt-based Web interface for managing virtual machines. It allows you to create and configure new domains, and adjust a domain's resource allocation. A VNC viewer presents a full graphical console to the guest domain. KVM is currently the only hypervisor supported.
 
 ### Technology:
 
@@ -24,20 +30,22 @@ WebVirtMgr is licensed under the Apache Licence, Version 2.0 (http://www.apache.
 
 Run:
 
-    $ su -c 'yum -y install git Django python-virtinst httpd mod_python mod_wsgi'
+    $ su -c 'yum -y install git Django python-virtinst httpd mod_python mod_wsgi python-websockify python-setuptools'
 
 ### Ubuntu 12.04 and above
 
 Run:
 
-    $ sudo apt-get install git python-django virtinst apache2 libapache2-mod-python libapache2-mod-wsgi
+    $ sudo apt-get install git python-django virtinst apache2 libapache2-mod-python libapache2-mod-wsgi novnc
+    $ sudo service novnc stop
+    $ sudo update-rc.d novnc remove
 
 ### CentOS 6.2, RedHat 6.2 and above
 
 Run:
 
     $ su -c 'rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm'
-    $ su -c 'yum -y install git python-virtinst httpd mod_python mod_wsgi Django'
+    $ su -c 'yum -y install git python-virtinst httpd mod_python mod_wsgi Django python-websockify python-setuptools'
 
 ## 3. Setup
 
@@ -106,7 +114,37 @@ Add file webvirtmgr.conf in conf.d directory (Ubuntu: "/etc/apache2/conf.d" or R
       Allow from all
     </Directory>
 
-## 5. Update
+## 5. Gunicorn and Runit (Only for geeks)
+
+WSGI for gunicorn:
+    
+    webvirtmgr/wsgi.py
+    
+Add line <code>'gunicorn',</code> in file settings.py:
+
+    INSTALLED_APPS = (
+    ...
+    'gunicorn',
+    )
+
+Runit script for webvirtmgr (/etc/sv/webvirtmgr/run):
+
+    #!/bin/bash
+
+    GUNICORN=/usr/local/bin/gunicorn
+    ROOT=/var/www/webvirtmgr
+    PID=/var/run/gunicorn.pid
+
+    APP=wsgi:application
+
+    if [ -f $PID ]; then
+       rm $PID
+    fi
+
+    cd $ROOT
+    exec $GUNICORN -c $ROOT/gunicorn.conf.py --pid $PID $APP
+
+## 6. Update
 
     $ cd /path to/webvirtmgr
     $ git pull
