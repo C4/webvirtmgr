@@ -265,9 +265,9 @@
             "sWrapper": "dataTables_wrapper form-inline"
         } );
         $(document).ready(function() {    
-            $.get("/service/instances", function (data){
-              if (data.status == "success"){
-                instances = data.data
+            $.get("/api/instances/", function (data){
+              if (data.meta){
+                instances = data.objects
                 $('#instance_list').show();
                 $('#instance_list tbody').empty();
                 $(".loading").hide();
@@ -280,8 +280,8 @@
                       <td><strong><i class="icon-th-large"></i> <a href="/vm/'+instances[i].host_id+'/'+instances[i].name+'">'+instances[i].name+'</a></strong></td>\
                       <td>'+instances[i].ip+'</td>\
                       <td></td>\
-                      <td><span style="font-size:12px;">'+instances[i].id+'</span></td>\
-                      <td style="display:none;">'+instances[i].fqdn+'</td>\
+                      <td><span style="font-size:12px;">'+instances[i].instance_id+'</span></td>\
+                      <td style="display:none;">'+instances[i].dns_name+'</td>\
                       <td>'+instances[i].cpu_number+'</td>\
                       <td>'+instances[i].memory+'</td>\
                       <td>'+dstate+'</td>\
@@ -307,7 +307,7 @@
                 } );                             
               }else{
                 $("#instance_list").hide();
-                $(".loading").hide().empty().append("<h4>No Instances found.</h4>")
+                $(".loading").show().empty().append("<h4>No Instances found.</h4>")
               }
             }); 
             $(".i-edit").live("click", function(){
@@ -333,27 +333,27 @@
                      return -($(this).width() / 2); 
                  }
               });
-              $.get("/service/hosts", function (data){
-                if (data.status == "success"){
-                  hosts = data.data
+              $.get("/api/hosts/", function (data){
+                if (data.meta){
+                  hosts = data.objects
                   $('select[name="create_location"]').empty();
                   for (var i = 0; i < hosts.length; i++) {
                     $('select[name="create_location"]').append("<option value=\""+hosts[i].name+"\">"+hosts[i].name+"</option>");   
                   }               
                 }
               });
-              $.get("/service/instance_types", function (data){
-                if (data.status == "success"){
-                  itypes = data.data
+              $.get("/api/instance_types/", function (data){
+                if (data.meta){
+                  itypes = data.objects
                   $('select[name="create_instance_type"]').empty();
                   for (var i = 0; i < itypes.length; i++) {
                     $('select[name="create_instance_type"]').append("<option value=\""+itypes[i].name+"\">"+itypes[i].name+" ( "+itypes[i].cpu_number+" vCPU / "+itypes[i].memory+"MB Ram / "+itypes[i].disk_size+"GB Disk )</option>");   
                   }               
                 }
               });
-              $.get("/service/os_types", function (data){
-                if (data.status == "success"){
-                  ostypes = data.data
+              $.get("/api/os_types/", function (data){
+                if (data.meta){
+                  ostypes = data.objects
                   $('select[name="create_os_type"]').empty();
                   for (var i = 0; i < itypes.length; i++) {
                     $('select[name="create_os_type"]').append("<option value=\""+ostypes[i].name+"\">"+ostypes[i].name+" "+ostypes[i].version+" "+ostypes[i].description+"</option>");   

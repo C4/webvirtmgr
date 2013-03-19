@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import patterns, include, url
 from webvirtmgr import settings
+from webvirtmgr.virtmgr.api import *
 
 urlpatterns = patterns('',
     url(r'^$', 'webvirtmgr.virtmgr.views.index'),
@@ -31,5 +32,9 @@ urlpatterns = patterns('',
 
     url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT, 'show_indexes': False}),
 
-    url(r'^service/(\w+)/$', 'webvirtmgr.virtmgr.views.service'),    
+    url(r'^api/', include(InstancesResource().urls)),    
+    url(r'^api/', include(HostsResource().urls)),
+    url(r'^api/', include(InstanceTypesResource().urls)),
+    url(r'^api/', include(OSTypesResource().urls)),
+
 )

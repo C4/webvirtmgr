@@ -30,7 +30,6 @@ class Tags(models.Model):
         return self.hostname
 
 class InstanceTypes(models.Model):
-    itid = models.CharField(max_length=4)
     name = models.CharField(max_length=32)
     cpu = models.CharField(max_length=4)
     memory = models.CharField(max_length=16)
@@ -39,9 +38,21 @@ class InstanceTypes(models.Model):
         return self.name
 
 class OSTypes(models.Model):
-    osid = models.CharField(max_length=4)
     name = models.CharField(max_length=32)
     version = models.CharField(max_length=12)
     description = models.CharField(max_length=64)
+    def __unicode__(self):
+        return self.name
+
+class Instances(models.Model):
+    name = models.CharField(max_length=32)
+    host_id = models.CharField(max_length=4)
+    ip = models.IPAddressField()
+    state = models.CharField(max_length=16)    
+    memory = models.CharField(max_length=16)
+    cpu_number = models.CharField(max_length=4) 
+    location = models.CharField(max_length=16)   
+    virtualization_type = models.CharField(max_length=16)
+    dns_name = models.CharField(max_length=64)    
     def __unicode__(self):
         return self.name
