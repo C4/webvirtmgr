@@ -36,10 +36,10 @@
             <h3></h3>
           </div>
           <div class="modal-body">
-            <form class="form-horizontal" action="" method="post">{% csrf_token %}
+            <form class="form-horizontal" id="instance-edit-form" action="" method="POST">
               <fieldset>
                 <div class="control-group">
-                  <label class="control-label">Name</label>
+                  <label class="control-label">Instance Name</label>
                   <div class="controls">
                     <input type="text" name="hostname" class="input-xlarge" placeholder=""></input>
                   </div>
@@ -96,7 +96,7 @@
           </div>    
               <div class="modal-footer">
                 <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-                  <input type="submit" class="btn btn-success" name="add_host" value="Add">
+                <button class="btn btn-success" name="edit_instance" id="edit_instance">Add</button>
               </div>
             </form>
           
@@ -279,7 +279,7 @@
                   $('#instance_list tbody').append('<tr>\
                       <td><strong><i class="icon-th-large"></i> <a href="/vm/'+instances[i].host_id+'/'+instances[i].name+'">'+instances[i].name+'</a></strong></td>\
                       <td>'+instances[i].ip+'</td>\
-                      <td></td>\
+                      <td>'+instances[i].description+'</td>\
                       <td><span style="font-size:12px;">'+instances[i].instance_id+'</span></td>\
                       <td style="display:none;">'+instances[i].dns_name+'</td>\
                       <td>'+instances[i].cpu_number+'</td>\
@@ -315,10 +315,10 @@
                 $('#InstanceModal').modal('show');
                 $('#InstanceModal .modal-header h3').empty().append($(this).closest('tr').find('td:eq(0)').text());
                 $('input[name="hostname"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(0)').text());
-                $('input[name="ip"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(1)').text());
+                $('input[name="ip"]').prop('disabled', false).val($(this).closest('tr').find('td:eq(1)').text());
                 $('input[name="description"]').prop('disabled', false).val($(this).closest('tr').find('td:eq(2)').text());
                 $('input[name="instanceid"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(3)').text());
-                $('input[name="fqdn"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(4)').text());
+                $('input[name="fqdn"]').prop('disabled', false).val($(this).closest('tr').find('td:eq(4)').text());
                 $('input[name="cpu"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(5)').text());
                 $('input[name="memory"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(6)').text());
                 $('input[name="state"]').prop('disabled', true).val($(this).closest('tr').find('td:eq(7)').text());
@@ -360,7 +360,26 @@
                   }               
                 }
               });
-            });                     
+            });
+          $("#edit_instance").click(function(){
+            // Build the json block to send to the api
+            var jsondata = "{";
+            jsondata += '"instanceid":"'+$('#InstanceModal input[name="instanceid"]').val()+'",';
+            jsondata += '"ip":"'+$('#InstanceModal input[name="ip"]').val()+'",';
+            jsondata += '"description":"'+$('#InstanceModal input[name="description"]').val()+'",';
+            jsondata += '"dns_name":"'+$('#InstanceModal input[name="fqdn"]').val()+'"';
+            jsondata += "}";
+            $.ajax({
+               url: '/api/tags/0/',
+               type: 'PUT',
+               contentType: "application/json",
+               data: jsondata,
+               success: function(response) {
+                location.reload();
+               }
+            });
+            return false;
+          });
         });      
       </script>
 {% endblock %}

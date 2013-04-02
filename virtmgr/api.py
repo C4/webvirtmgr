@@ -1,6 +1,10 @@
 from tastypie import fields, utils
 from tastypie.resources import ModelResource
 from tastypie.resources import Resource
+from tastypie.authentication import BasicAuthentication
+from tastypie.authorization import DjangoAuthorization
+from tastypie.authorization import Authorization
+from tastypie.authentication import Authentication
 from webvirtmgr.virtmgr.models import *
 
 
@@ -128,6 +132,11 @@ class Instance(object):
     location = ''
     virtualization_type = ''
     dns_name = ''
+    description = ''
+    owner = ''
+    project = ''
+    team = ''
+    environment = ''
 
 class InstancesResource(Resource):
     def determine_format(self, request):
@@ -150,6 +159,11 @@ class InstancesResource(Resource):
     location = fields.CharField(attribute='location')
     virtualization_type = fields.CharField(attribute='virtualization_type')
     dns_name = fields.CharField(attribute='dns_name')
+    description = fields.CharField(attribute='description')
+    owner = fields.CharField(attribute='owner')
+    project = fields.CharField(attribute='project')
+    team = fields.CharField(attribute='team')
+    environment = fields.CharField(attribute='environment')
 
     def obj_get_list(self, request = None, **kwargs):
         hosts = Host.objects.all()
@@ -160,18 +174,37 @@ class InstancesResource(Resource):
             if type(instances) is list:
                 for index,instance in enumerate(instances):
                     i = Instance()
+                    ## Pulling some meta data if it exists for the instnace 
+                    queryset = Tags.objects.filter(instanceid__exact=instance['instanceid']).distinct()
+                    for metadata in queryset:
+                        i.ip = metadata.ip
+                        i.description = metadata.description
+                        i.owner = metadata.owner
+                        i.project = metadata.project
+                        i.team = metadata.team
+                        i.environment = metadata.environment
+                        i.dns_name = metadata.dns_name
                     i.id = index
                     i.instance_id = instance['instanceid']
                     i.host_id = instance['hostid']
                     i.name = instance['name']
-                    i.ip = instance['ip']
                     i.state = instance['state']
                     i.memory = instance['mem']
                     i.cpu_number = instance['cpu']
                     i.location = instance['location']
                     i.virtualization_type = instance['hypervisor']
-                    i.dns_name = instance['fqdn']
                     instance_list.append(i)
         return instance_list
+
+class TagsResource(ModelResource):
+    def determine_format(self, request):
+        return 'application/json'
+    class Meta:
+        queryset = Tags.objects.all()
+        authorization = Authorization()
+        resource_name = 'tags'
+        always_return_data = True
+        authentication = Authentication()
+
 
 

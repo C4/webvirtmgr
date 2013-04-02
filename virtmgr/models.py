@@ -29,15 +29,16 @@ class Vm(models.Model):
         return self.vname
 
 class Tags(models.Model):
-    name = models.CharField(max_length=32)
-    instanceid = models.CharField(max_length=64)
+    instanceid = models.CharField(max_length=64, primary_key=True)
+    description = models.CharField(max_length=128)
     ip = models.IPAddressField()
+    dns_name = models.CharField(max_length=128)
     owner = models.CharField(max_length=32)
     team = models.CharField(max_length=32)
     project = models.CharField(max_length=32)
     environment = models.CharField(max_length=32)
     def __unicode__(self):
-        return self.hostname
+        return self.instanceid
 
 class InstanceTypes(models.Model):
     name = models.CharField(max_length=32)

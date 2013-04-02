@@ -38,5 +38,5 @@ urlpatterns = patterns('',
     url(r'^api/', include(HostsResource().urls)),
     url(r'^api/', include(InstanceTypesResource().urls)),
     url(r'^api/', include(OSTypesResource().urls)),
-
+    url(r'^api/', include(TagsResource().urls)),
 )
